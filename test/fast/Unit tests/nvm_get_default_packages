@@ -1,5 +1,6 @@
 #!/bin/sh
 
+: nvm.sh
 \. ../../../nvm.sh
 
 FILE="${NVM_DIR}/default-packages"
@@ -90,5 +91,15 @@ EXPECTED_PKGS=''
 [ "${DEFAULT_PKGS}" = "${EXPECTED_PKGS}" ] || die "5: expected default packages >${EXPECTED_PKGS}<; got >${DEFAULT_PKGS}<"
 
 touch "${FILE}"
+
+cleanup
+
+setup
+
+printf 'rimraf\r\nobject-inspect@1.0.2\r\n\r\n# commented-package\r\n\r\nstevemao/left-pad\r\n' > "${FILE}"
+
+DEFAULT_PKGS="$(nvm_get_default_packages)"
+EXPECTED_PKGS='rimraf object-inspect@1.0.2 stevemao/left-pad'
+[ "${DEFAULT_PKGS}" = "${EXPECTED_PKGS}" ] || die "6: expected default packages from a CRLF file >${EXPECTED_PKGS}<; got >${DEFAULT_PKGS}<"
 
 cleanup

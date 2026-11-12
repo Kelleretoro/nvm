@@ -14,9 +14,13 @@ cleanup() {
   rm -rf "$TEST_PATH"
 }
 
+: nvm.sh
 \. ../../../nvm.sh
 
 set -ex
+
+# these mocks must not be recorded as the LTS status of $NVM_DIR's versions
+nvm_record_lts_status() { :; }
 
 MOCKS_DIR="$PWD/mocks"
 

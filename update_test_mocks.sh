@@ -20,6 +20,16 @@ nvm_make_alias() {
   return 0
 }
 
+nvm_get_remote_aliases() {
+  # prevent local aliases from leaking into `nvm ls-remote` mocks
+  return 0
+}
+
+nvm_has_italics() {
+  # keep mocks independent of the local terminal's italics support
+  return 0
+}
+
 nvm_ls_remote > "$MOCKS_DIR/nvm_ls_remote.txt"
 nvm_ls_remote_iojs > "$MOCKS_DIR/nvm_ls_remote_iojs.txt"
 NVM_LTS=* nvm_ls_remote > "$MOCKS_DIR/nvm_ls_remote LTS.txt"
@@ -42,6 +52,15 @@ NVM_NODEJS_ORG_MIRROR=https://nodejs.org/download/nightly/ nvm_ls_remote stable 
 NVM_NODEJS_ORG_MIRROR=https://nodejs.org/download/nightly/ NVM_LTS=* nvm_ls_remote > "$MOCKS_DIR/nvm_ls_remote LTS nightly.txt"
 NVM_NODEJS_ORG_MIRROR=https://nodejs.org/download/nightly/ NVM_LTS=argon nvm_ls_remote > "$MOCKS_DIR/nvm_ls_remote LTS nightly argon.txt"
 set -e
+
+# the LTS status that `nodejs.org-dist-index.tab` records, written to the mock instead of `$NVM_DIR`
+(
+  nvm_lts_status_path() {
+    nvm_echo "$MOCKS_DIR/nodejs.org-dist-lts-status.txt"
+  }
+  command rm -f "$(nvm_lts_status_path)"
+  command sed 1d "$MOCKS_DIR/nodejs.org-dist-index.tab" | nvm_record_lts_status
+)
 
 ALIAS_PATH="$MOCKS_DIR/nvm_make_alias LTS alias calls.txt"
 : > "$ALIAS_PATH"
